@@ -31,6 +31,10 @@ class Card(object):
     def same_color(self, _card):
         return self.suit() % 2 == _card.suit() % 2
 
+    # следующая карта
+    def next_card(self, _card: object) -> object:
+        return (_card.range() - self.range() == 1) or (_card.range() == 0 and self.range() == 12)
+
     # расшифровка карты
     def __str__(self):
         _tempI = ''
@@ -83,6 +87,7 @@ class PrintStyle:
    UNDER = '\033[4m'
    END = '\033[0m'
 
+
 # определяем класс колода карт, если вход пустой, то формируем раздачу 52 карты
 class DeckOfCards(object):
 
@@ -100,10 +105,10 @@ class DeckOfCards(object):
         return
 
     def see_first_card(self):
-        return self.list_of_cards[0] if len(self) else None
+        return self.list_of_cards[0] if len(self) else Card(63)
 
     def see_end_card(self):
-        return self.list_of_cards[len(self) - 1] if len(self) >= 1 else None
+        return self.list_of_cards[len(self) - 1] if len(self) >= 1 else Card(63)
 
     def get_first_card(self):
         _x = None
@@ -139,6 +144,7 @@ class DeckOfCards(object):
 
     def rand(self):  # перемешивает раздачу в случайном порядке
         random.shuffle(self.list_of_cards)
+        return
 
     def __len__(self):
         return len(self.list_of_cards)
@@ -154,7 +160,7 @@ class GameTable(object):
         for _tempI in range(4):  self.play_off.append(DeckOfCards(0))
 
         self.play_stack = DeckOfCards(0)
-        self.play_stack_index = 0
+        self.play_st_i = 0
         self.play_visible = []
         for _tempI in range(7):  self.play_visible.append(DeckOfCards(0))
         self.play_invisible = []
@@ -172,23 +178,78 @@ class GameTable(object):
                 self.play_stack.app_end_card(_input_deck.get_first_card())
         return
 
+    # анализ текущего состояния и поиск возможных ходов
     def search_moves(self):     # ищем активные шаги
+        # очистим список
+        self.active_move.clear()
+        # анализируем visible - перебор
+        for _heapI in self.play_visible:
+            # смотрим карту в столбце
+            for _tempI in _heapI.list_of_cards:
+                # проверим OFF
+                _y = _tempI.suit()
+                _x = self.play_off[_y].see_first_card()
+                if (_tempI.range() == 12 and len(self.play_off[_y]) == 0 ) or (not _x and _x.next_card(_tempI)):
 
-        self.active_move.append(Move())
+                    self.active_move.append(Move('vis',
+                                                 self.play_visible.index(_heapI),
+                                                 _heapI.list_of_cards.index(_tempI), _tempI,
+                                                 'off', _y, 0, _x))
+
+                # проходим по визиблу
+                for _tempJ in self.play_visible:
+                    _x = _tempJ.see_first_card()
+                    # это не тот же столбец
+                    if _tempJ != _heapI:
+                        # разный цвет и следующая
+                        if (not _tempI.same_color(_x)) and _tempI.next_card(_x) and _x.range() != 12:
+                            self.active_move.append(Move('vis',
+                                                    self.play_visible.index(_heapI),
+                                                         _heapI.list_of_cards.index(_tempI),
+                                                         _tempI,
+                                                        'vis',
+                                                        self.play_visible.index(_tempJ),
+                                                        _tempJ.list_of_cards.index(_x), _x))
+                            # проверка возможности сноса Короля на пустое место!!!!!!  доаботать когда пойдут сдвиги
+                        if _tempI.range() == 11 and _x.number() == 63:
+                            self.active_move.append(Move('vis',
+                                                         self.play_visible.index(_heapI),
+                                                         _heapI.list_of_cards.index(_tempI),
+                                                         _tempI,
+                                                         'vis',
+                                                         self.play_visible.index(_tempJ),
+                                                         _tempJ.list_of_cards.index(_x), _x))
+
+        # проверим карту стека
+        _y = self.play_stack.list_of_cards[self.play_st_i]
+        for _tempJ in self.play_visible:
+            _x = _tempJ.see_first_card()
+            if (not _y.same_color(_x)) and _y.next_card(_x) and _x.range() != 12:
+                self.active_move.append(Move('stk', 0, self.play_st_i, _y,
+                                         'vis',
+                                         self.play_visible.index(_tempJ),
+                                         _tempJ.list_of_cards.index(_x), _x))
+        # проверим OFF для стека
+        _z = _tempI.suit()
+        _x = self.play_off[_z].see_first_card()
+        if (_tempI.range() == 12 and len(self.play_off[_z]) == 0 ) or (not _x and _x.next_card(_tempI)):
+            self.active_move.append(Move('stk', 0, self.play_st_i, _y,
+                                         'off', _z, 0, _x))
 
         return
 
-    def __str__(self):  # печатаем игровой стол
+    # печатаем игровой стол
+    def __str__(self):
         _x = ''
         for _tempI in self.play_off: _x = _x + _tempI.__str__()
-        _x = '[' + _x + '] <|*|> ' + self.play_stack.__str__(self.play_stack_index) + '\n'
+        _x = '[' + _x + '] <|*|> ' + self.play_stack.__str__(self.play_st_i) + '\n'
 
         for _tempI in self.play_invisible:
             _x = _x + _tempI.__str__()
         _x = _x + '\n'
         for _tempI in self.play_visible:
             _x = _x + _tempI.__str__()
-        _x = _x + '\n A**> '
+        _x = _x + '\n\n A**> '
         for _tempI in self.active_move:
             _x = _x + _tempI.__str__()
 
@@ -196,27 +257,38 @@ class GameTable(object):
 
 
 # ------------------------------------------------------------------------------------------
-class Move(object):             # класс ход для удобства
+class Move(object):             # класс запись хода для удобства
 
-    def __init__(self, _fromN='non', _fromI=0, _toN='non', _toI=0):
+    def __init__(self, _fromN='non', _fromI=0, _fromJ=0, _card1=Card(63), _toN='non', _toI=0, _toJ=0, _card2=Card(63)):
         # 'off', 'vis', 'stk'
         self.from_name = _fromN
-        self.from_index = _fromI
+        self.from_i = _fromI
+        self.from_j = _fromJ
+        self.card1 = _card1
         self.to_name = _toN
-        self.to_index = _toI
+        self.to_i = _toI
+        self.to_j = _toJ
+        self.card2 = _card2
         return
 
     def __str__(self):
-        return '|' + self.from_name + '/' + str(self.from_index) + '->' + self.to_name + '/' + str(self.to_index) + '|'
+        return '|' + self.card1.__str__() + '->' + self.card2.__str__() + '|'
+#       return '|' + self.card1.__str__() + '->' + self.card2.__str__() + '(' + self.from_name + '/' + str(self.from_i)+ '-' + str(self.from_j)  \
+#               + '->' + self.to_name + '/' + str(self.to_i)+ '-' + str(self.to_j)  + ')|'
 
 
 # начало программы
 if __name__ == '__main__':
 
     k = DeckOfCards()
-    #k.rand()
+    k.rand()
 
     j = GameTable(k)
     j.search_moves()
     print(j)
 
+
+
+#    for i in range(0,51):
+#        j = Card(i)
+#        print(j, j.number(), j.range(), j.suit())
