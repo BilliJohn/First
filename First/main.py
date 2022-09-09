@@ -122,13 +122,15 @@ class DeckOfCards(object):
             _x = self.list_of_cards.pop()
         return _x
 
-    def app_first_card(self, _app_card=63):
-        self.list_of_cards.reverse()
-        self.list_of_cards.append(_app_card)
-        self.list_of_cards.reverse()
+    def app_first_card(self, _app_card):
+        _x = [_app_card]
+        _x.extend(self.list_of_cards)
+        self.list_of_cards = copy.deepcopy(_x)
+        #self.list_of_cards.append(_app_card)
+        #self.list_of_cards.reverse()
         return
 
-    def app_end_card(self, _app_card=63):
+    def app_end_card(self, _app_card):
         self.list_of_cards.append(_app_card)
         return
 
@@ -161,11 +163,14 @@ class GameTable(object):
 
         self.play_stack = DeckOfCards(0)
         self.play_st_i = 0
+        # если 100, значит это первый проход. N - количество проходов стека без сноса
+        self.count_stack = 100
         self.play_visible = []
         for _tempI in range(7):  self.play_visible.append(DeckOfCards(0))
         self.play_invisible = []
         for _tempI in range(7):  self.play_invisible.append(DeckOfCards(0))
         self.active_move = []
+        self.move_history = []
 
         if len(_input_deck) == 52:          # раздаем карты
             _x = 0
@@ -180,6 +185,15 @@ class GameTable(object):
 
     # анализ текущего состояния и поиск возможных ходов
     def search_moves(self):     # ищем активные шаги
+        # следующую карту в стеке если больше нет ходов
+        if self.count_stack != 100:
+            if len(self.active_move) == 0:
+                if self.play_st_i >= 63:
+                    self.play_st_i = self.play_st_i - 63
+                self.play_st_i = self.play_st_i + 1 if len(self.play_stack) - 2 > j.play_st_i else 0
+        else:
+            self.count_stack = 0
+
         # очистим список
         self.active_move.clear()
         # анализируем visible - перебор
@@ -189,8 +203,7 @@ class GameTable(object):
                 # проверим OFF
                 _y = _tempI.suit()
                 _x = self.play_off[_y].see_first_card()
-                if (_tempI.range() == 12 and len(self.play_off[_y]) == 0 ) or (not _x and _x.next_card(_tempI)):
-
+                if (_tempI.range() == 12 and _x != Card(63)) or _x.next_card(_tempI):
                     self.active_move.append(Move('vis',
                                                  self.play_visible.index(_heapI),
                                                  _heapI.list_of_cards.index(_tempI), _tempI,
@@ -210,39 +223,78 @@ class GameTable(object):
                                                         'vis',
                                                         self.play_visible.index(_tempJ),
                                                         _tempJ.list_of_cards.index(_x), _x))
-                            # проверка возможности сноса Короля на пустое место!!!!!!  доаботать когда пойдут сдвиги
-                        if _tempI.range() == 11 and _x.number() == 63:
+                        # проверка возможности сноса Короля на пустое место!!!!!!  доаботать когда пойдут сдвиги
+                        if _tempI.range() == 11 and _x.number() == 63 \
+                                and len(self.play_invisible[self.play_visible.index(_tempJ)]) == 0:
                             self.active_move.append(Move('vis',
                                                          self.play_visible.index(_heapI),
                                                          _heapI.list_of_cards.index(_tempI),
                                                          _tempI,
                                                          'vis',
                                                          self.play_visible.index(_tempJ),
-                                                         _tempJ.list_of_cards.index(_x), _x))
+                                                         0, _x))
 
-        # проверим карту стека
-        _y = self.play_stack.list_of_cards[self.play_st_i]
-        for _tempJ in self.play_visible:
-            _x = _tempJ.see_first_card()
-            if (not _y.same_color(_x)) and _y.next_card(_x) and _x.range() != 12:
+        # проверим карту стека. Пока список ходов не пустой - стек не двигаем
+        if self.play_st_i >= 63:
+            _y = self.play_stack.list_of_cards[self.play_st_i]
+            for _tempJ in self.play_visible:
+                _x = _tempJ.see_first_card()
+                if (not _y.same_color(_x)) and _y.next_card(_x) and _x.range() != 12:
+                    self.active_move.append(Move('stk', 0, self.play_st_i, _y,
+                                             'vis',
+                                             self.play_visible.index(_tempJ),
+                                             _tempJ.list_of_cards.index(_x), _x))
+            # проверим OFF для стека
+            _z = _y.suit()
+            _x = self.play_off[_z].see_first_card()
+            if (_y.range() == 12 and _x.number() == 63) or _x.next_card(_y):
                 self.active_move.append(Move('stk', 0, self.play_st_i, _y,
-                                         'vis',
-                                         self.play_visible.index(_tempJ),
-                                         _tempJ.list_of_cards.index(_x), _x))
-        # проверим OFF для стека
-        _z = _tempI.suit()
-        _x = self.play_off[_z].see_first_card()
-        if (_tempI.range() == 12 and len(self.play_off[_z]) == 0 ) or (not _x and _x.next_card(_tempI)):
-            self.active_move.append(Move('stk', 0, self.play_st_i, _y,
-                                         'off', _z, 0, _x))
-
+                                             'off', _z, 0, _x))
         return
 
+    # делаем ход
+    def get_move(self):
+        if len(self.active_move):
+            _move = self.active_move.pop(0)
+            self.move_history.append(_move)
+            _x = DeckOfCards(0)
+            if _move.from_name == 'vis':
+                _x.list_of_cards.extend(self.play_visible[_move.from_i].list_of_cards[_move.from_j:])
+                del self.play_visible[_move.from_i].list_of_cards[_move.from_j:]
+
+                if _move.to_name == 'vis':
+                    for _tempI in _x.list_of_cards:
+                        self.play_visible[_move.to_i].app_first_card(_tempI)
+                elif _move.to_name == 'off':
+                    for _tempI in _x.list_of_cards:
+                        self.play_off[_move.to_i].app_first_card(_tempI)
+
+            elif _move.from_name == 'stk':
+                _tempI = self.play_stack.list_of_cards[self.play_st_i]
+                del self.play_stack.list_of_cards[self.play_st_i]
+
+                if _move.to_name == 'vis':
+                    self.play_visible[_move.to_i].app_first_card(_tempI)
+                elif _move.to_name == 'off':
+                    for _tempI in _x.list_of_cards:
+                        self.play_off[_move.to_i].app_first_card(_tempI)
+                # уменьшим счетчик
+                self.play_st_i = self.play_st_i + 63
+
+        # откроем недостающее
+        for _tempI in range(0, 7):
+            if len(self.play_visible[_tempI]) == 0 and len(self.play_invisible[_tempI]) != 0:
+                self.play_visible[_tempI].app_first_card(self.play_invisible[_tempI].get_first_card())
+
+    # приведение стола в порядок после хода
+    def after_move(self):
+        return
     # печатаем игровой стол
     def __str__(self):
-        _x = ''
-        for _tempI in self.play_off: _x = _x + _tempI.__str__()
-        _x = '[' + _x + '] <|*|> ' + self.play_stack.__str__(self.play_st_i) + '\n'
+        _x = '\n*-----------------------------------------------------------------------------------------\n'
+        for _tempI in self.play_off:
+            _x = _x + _tempI.__str__()
+        _x = '' + _x + ' <|*|> ' + self.play_stack.__str__(self.play_st_i) + '\n'
 
         for _tempI in self.play_invisible:
             _x = _x + _tempI.__str__()
@@ -251,6 +303,9 @@ class GameTable(object):
             _x = _x + _tempI.__str__()
         _x = _x + '\n\n A**> '
         for _tempI in self.active_move:
+            _x = _x + _tempI.__str__()
+        _x = _x + '\n И**> '
+        for _tempI in self.move_history:
             _x = _x + _tempI.__str__()
 
         return _x
@@ -286,9 +341,9 @@ if __name__ == '__main__':
     j = GameTable(k)
     j.search_moves()
     print(j)
+    while len(j.active_move) > 0:
+        j.get_move()
+        j.after_move()
+        j.search_moves()
+        print(j)
 
-
-
-#    for i in range(0,51):
-#        j = Card(i)
-#        print(j, j.number(), j.range(), j.suit())
