@@ -442,9 +442,7 @@ class GameTable(object):
         _x = '\n*-----------------------------------------------------------------------------------------\n'
         for _tempI in self.play_off:
             _x = _x + _tempI.__str__()
-        _x = '' + _x + '\n\nC->' + self.play_stack.__str__(self.play_st_i)      #+ '\n\nН->'
-        # for _tempI in self.play_invisible:
-        #     _x = _x + _tempI.__str__()
+        _x = '' + _x + '\n\nC->' + self.play_stack.__str__(self.play_st_i) + '\n'
         _x = _x + self.nice_look()
 
         return _x
@@ -473,7 +471,7 @@ class Move(object):  # класс запись хода для удобства
 if __name__ == '__main__':
 
     GLOBAL_TRACE = False
-    sss = 'n'
+    sss = 'y'
     # sss = input('новую колоду? ->')
     if sss == 'y':
         k = DeckOfCards()
