@@ -7,9 +7,9 @@ import copy
 import random
 import hashlib
 import pickle
-
-global GLOBAL_TRACE
-GLOBAL_TRACE = True
+import time
+global GLOBAL_TRACE, GLOBAL_SUCSESS
+GLOBAL_TRACE = False
 
 
 # определение класса - карта;
@@ -189,8 +189,8 @@ class GameTable(object):
 
     def __init__(self, _input_deck=DeckOfCards(0)):
 
-        self.start_deck = _input_deck
-        self.start_hash = hashlib.sha1(pickle.dumps(self.start_deck))
+        self.start_deck = copy.deepcopy(_input_deck)
+        self.start_hash = hash(tuple(self.start_deck.list_of_cards.__str__()))
         self.play_off = []
         for _tempI in range(4):
             self.play_off.append(DeckOfCards(0))
@@ -207,6 +207,8 @@ class GameTable(object):
         self.active_move = []
         self.move_history = []
         self.count_moves = 0
+        self.desicion_time = 0.0
+        self.win = False
 
         if len(_input_deck) == 52:  # раздаем карты
             _x = 0
@@ -218,6 +220,28 @@ class GameTable(object):
             for _tempI in range(1, len(_input_deck.list_of_cards) + 1):
                 self.play_stack.app_end_card(_input_deck.get_first_card())
         return
+
+    #  решение игрового стола
+    def decision_table(self):
+
+        time_start = time.time()
+
+        while (len(self.active_move) > 0 or self.count_stack != 0) and len(self.move_history) <= 250:
+            self.search_moves()
+            self.do_move()
+            self.check_table()
+
+        # проверяем сходимость
+        _desi = True
+        for i in range(0,3):
+            _desi = _desi and len(self.play_off[i].list_of_cards) == 13
+        if _desi:
+            print('***********')
+            self.win = True
+
+        self.desicion_time = round(time.time() - time_start, 5)
+
+        return self.win
 
     # проверка игрового стола, ничего не пропало
     def check_table(self):
@@ -242,6 +266,7 @@ class GameTable(object):
         GLOBAL_TRACE = (_all_card != 52 or _all_sum)
 
         #  логическое соответствие !!!!!!!!!!!!!!!
+
 
         if GLOBAL_TRACE:
             print('карт->', _all_card, 'сумма->', _all_sum)
