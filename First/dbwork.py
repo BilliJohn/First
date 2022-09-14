@@ -3,9 +3,9 @@
 '''
 from mysql import connector as db
 import cardclass as cd
-import pickle
 import json
-import marshal as msh
+import os, platform, subprocess, re
+
 
 
 def save_to_sql(_in_table=cd.GameTable()):
@@ -39,6 +39,46 @@ def save_to_sql(_in_table=cd.GameTable()):
         conn.commit()
         conn.close()
 
+    except Error as error:
+        print(f'<h2>Ошибка подключения к БД: {error} </h2>')
+
+    return
+
+
+#  сохранение информации об эксперименте
+def log_attemp(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
+    Error = []
+    _id = 0
+    _time_des_avg = round(_all_time/_all_steps,3)
+
+    try:
+        conn = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168', port=3306)
+        cur = conn.cursor()
+
+        # соберем инфо по железу
+        _text = platform.system()
+        if _text == "Linux":
+            command = "cat /proc/cpuinfo"
+            all_info = subprocess.check_output(command, shell=True).decode().strip()
+            for line in all_info.split("\n"):
+                if "model name" in line:
+                    _i = re.sub(".*model name.*:", "", line, 1)
+            _k = os.uname()
+            _text = '(' + _text + ', ' + _k[3] + '):' + _i + '; ' + _k[1]
+            # print(_text)
+
+        # проверим наличие такого ID. Лишних проверок не делаем....
+        query = "SELECT MAX(ID) FROM attempts"
+        cur.execute(query)
+        _i = cur.fetchone()
+        _id = _i[0] + 1
+
+        query = "INSERT INTO attempts (ID, ALL_TIME, ALL_STEPS, TIME_DES_AVG, COUNT_WIN, AVG_WIN, NOTE) VALUES ({}, {}, {}, {}, {}, {}, '{}')".format(
+            _id, _all_time, _all_steps, _time_des_avg, _count_win, _avg_win, _text)
+        # print(query)
+        cur.execute(query)
+        conn.commit()
+        conn.close()
     except Error as error:
         print(f'<h2>Ошибка подключения к БД: {error} </h2>')
 

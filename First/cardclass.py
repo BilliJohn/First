@@ -236,7 +236,7 @@ class GameTable(object):
         for i in range(0,3):
             _desi = _desi and len(self.play_off[i].list_of_cards) == 13
         if _desi:
-            print('***********')
+            # print('***********')
             self.win = True
 
         self.desicion_time = round(time.time() - time_start, 5)
