@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
 '''
 
 классы по работе с картами
@@ -5,10 +7,8 @@
 '''
 import copy
 import random
-import hashlib
-import pickle
 import time
-global GLOBAL_TRACE, GLOBAL_SUCSESS
+global GLOBAL_TRACE, _DECK_TUPLE
 GLOBAL_TRACE = False
 
 
@@ -132,6 +132,8 @@ class DeckOfCards(object):
         else:  # ничего нет - даем 52 карты
             for _tempI in range(52):
                 self.list_of_cards.append(Card(_tempI))
+
+        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', _DECK_TUPLE)
         return
 
     def see_first_card(self):

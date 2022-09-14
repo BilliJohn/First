@@ -1,5 +1,7 @@
 '''
-Функции работы с SQL сервером
+
+Функции работы с SQL сервером (mariaDB)
+
 '''
 from mysql import connector as db
 import cardclass as cd
@@ -7,16 +9,29 @@ import json
 import os, platform, subprocess, re
 
 
+# откроем БД
+def open_db():
+    connection = None
+    Error = []
+    try:
+        connection = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168', port=3306)
+    except Error as error:
+        print(f'Ошибка подключения к БД: {error}')
+    return connection
 
-def save_to_sql(_in_table=cd.GameTable()):
+
+#  закроем БД
+def close_db(connection=None):
+    if connection:
+        connection.commit()
+        connection.close()
+    return
+
+
+def log_deck(_in_table=cd.GameTable(), _log_connection=None):
     _in_table: cd.GameTable
 
-    Error = []
-
-    try:
-        conn = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168', port=3306)
-        cur = conn.cursor()
-
+    if _log_connection:
         # готовим информацию к сохранению
         _deck_num, _k = [], []
         _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
@@ -24,6 +39,7 @@ def save_to_sql(_in_table=cd.GameTable()):
         _json = json.dumps(_k)
 
         # проверим наличие такого ID
+        cur = _log_connection.cursor()
         query = "SELECT ID_HASH FROM gametables WHERE ID_HASH = {}".format(_in_table.start_hash)
         cur.execute(query)
 
@@ -33,28 +49,22 @@ def save_to_sql(_in_table=cd.GameTable()):
         else:
             query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
                 _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves)
-
         # print(query)
+
         cur.execute(query)
-        conn.commit()
-        conn.close()
 
-    except Error as error:
-        print(f'<h2>Ошибка подключения к БД: {error} </h2>')
-
+        # cur.close()
+        # _log_connection.commit()
+        # connection.close()
     return
 
 
 #  сохранение информации об эксперименте
-def log_attemp(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
-    Error = []
+def log_attemp(_log_connection=None, _all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
     _id = 0
-    _time_des_avg = round(_all_time/_all_steps,3)
-
-    try:
-        conn = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168', port=3306)
-        cur = conn.cursor()
-
+    if _log_connection:
+        cur = _log_connection.cursor()
+        _time_des_avg = round(_all_time / _all_steps, 3)
         # соберем инфо по железу
         _text = platform.system()
         if _text == "Linux":
@@ -65,7 +75,6 @@ def log_attemp(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
                     _i = re.sub(".*model name.*:", "", line, 1)
             _k = os.uname()
             _text = '(' + _text + ', ' + _k[3] + '):' + _i + '; ' + _k[1]
-            # print(_text)
 
         # проверим наличие такого ID. Лишних проверок не делаем....
         query = "SELECT MAX(ID) FROM attempts"
@@ -77,9 +86,7 @@ def log_attemp(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
             _id, _all_time, _all_steps, _time_des_avg, _count_win, _avg_win, _text)
         # print(query)
         cur.execute(query)
-        conn.commit()
-        conn.close()
-    except Error as error:
-        print(f'<h2>Ошибка подключения к БД: {error} </h2>')
 
+        # cur.close()
+        # _log_connection.commit()
     return
