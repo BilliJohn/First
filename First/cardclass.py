@@ -1,15 +1,18 @@
-#!/usr/bin/python3
-# -*- coding: UTF-8 -*-
 '''
 
 классы по работе с картами
 
 '''
+
 import copy
 import random
 import time
-global GLOBAL_TRACE, _DECK_TUPLE
+
+global GLOBAL_TRACE
 GLOBAL_TRACE = False
+
+# global GL_CARD_DECK
+GL_CARD_DECK = []
 
 
 # определение класса - карта;
@@ -42,7 +45,7 @@ class Card(object):
 
     # масть 3 -> 000011
     def suit(self):
-        return self.card_num & 3 #if self.card_num != 63 else 63
+        return self.card_num & 3
 
     # один цвет
     def same_color(self, _card):
@@ -58,7 +61,6 @@ class Card(object):
         _x = 63
         if isinstance(self.card_num, int) and 0 <= self.card_num <= 51:
             _x = Card.suit(self)
-            _y = Card.range(self)
             # масть
             if _x == 3:
                 _tempI = f'\u2660'  # пики
@@ -69,6 +71,7 @@ class Card(object):
             elif _x == 0:
                 _tempI = f'\u2665'  # 'Ч'
             # ранг
+            _y = Card.range(self)
             if _y == 12:
                 _tempI = ' Т' + _tempI
             elif _y == 0:
@@ -106,6 +109,8 @@ class Card(object):
 
         return _tempI
 
+# КАКАЯ-ТО ХРЕНОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ. НЕ РАБОТАЕТ МЕЖДУ МОДУЛЯМИ
+GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
 
 # ---------------------------------------------------------------------------------------------
 class PrintStyle:
@@ -119,8 +124,11 @@ class PrintStyle:
 
 # определяем класс колода карт, если вход пустой, то формируем раздачу 52 карты
 class DeckOfCards(object):
+    # global GL_CARD_DECK
 
     def __init__(self, _input_list=[]):  # при инициации, или входной список или последовательный набор карт
+        # global GL_CARD_DECK
+
         self.list_of_cards = []
 
         if isinstance(_input_list,
@@ -130,10 +138,10 @@ class DeckOfCards(object):
         elif isinstance(_input_list, int) and _input_list == 0:  # создаем пустой список
             self.list_of_cards = []
         else:  # ничего нет - даем 52 карты
-            for _tempI in range(52):
-                self.list_of_cards.append(Card(_tempI))
+            # print(GL_CARD_DECK)
+            self.list_of_cards = copy.deepcopy(GL_CARD_DECK)
+            # self.list_of_cards.extend(Card(_i) for _i in range(0, 52))
 
-        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', _DECK_TUPLE)
         return
 
     def see_first_card(self):
@@ -176,7 +184,8 @@ class DeckOfCards(object):
             _y = _y + 1
         return _x + ']'
 
-    def rand(self):  # перемешивает раздачу в случайном порядке
+    # перемешивает раздачу в случайном порядке
+    def rand(self):
         random.shuffle(self.list_of_cards)
         return
 
@@ -188,6 +197,7 @@ class DeckOfCards(object):
 
 # определяем класс игровой стол (косынка)
 class GameTable(object):
+    global GL_CARD_DECK
 
     def __init__(self, _input_deck=DeckOfCards(0)):
 
@@ -511,3 +521,5 @@ class Move(object):  # класс запись хода для удобства
 
     def __ne__(self, other):
         return self.card1 != other.card1 or self.card2 != other.card2
+
+

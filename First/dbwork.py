@@ -14,7 +14,8 @@ def open_db():
     connection = None
     Error = []
     try:
-        connection = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168', port=3306)
+        connection = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168',
+                                port=3306)
     except Error as error:
         print(f'Ошибка подключения к БД: {error}')
     return connection
@@ -28,6 +29,22 @@ def close_db(connection=None):
     return
 
 
+def get_debug(_log_connection=None):
+    _in_table: cd.GameTable
+
+    if _log_connection:
+
+        if cur.fetchone():
+            query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
+                _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves, _in_table.start_hash)
+        else:
+            query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
+                _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves)
+        cur.execute(query)
+    return
+
+
+# сохранение раздачи с результатами
 def log_deck(_in_table=cd.GameTable(), _log_connection=None):
     _in_table: cd.GameTable
 
@@ -49,13 +66,7 @@ def log_deck(_in_table=cd.GameTable(), _log_connection=None):
         else:
             query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
                 _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves)
-        # print(query)
-
         cur.execute(query)
-
-        # cur.close()
-        # _log_connection.commit()
-        # connection.close()
     return
 
 
@@ -84,9 +95,5 @@ def log_attemp(_log_connection=None, _all_time=0.0, _all_steps=1, _count_win=0, 
 
         query = "INSERT INTO attempts (ID, ALL_TIME, ALL_STEPS, TIME_DES_AVG, COUNT_WIN, AVG_WIN, NOTE) VALUES ({}, {}, {}, {}, {}, {}, '{}')".format(
             _id, _all_time, _all_steps, _time_des_avg, _count_win, _avg_win, _text)
-        # print(query)
         cur.execute(query)
-
-        # cur.close()
-        # _log_connection.commit()
     return
