@@ -8,11 +8,24 @@ import copy
 import random
 import time
 
+# from pymysql import  connector as db
+import pymysql as db
+import json
+import os, platform, subprocess, re
+
+# import aiosql
+# import aiosqlite
+# import aiom
+
+import asyncio
+import aiomysql
+
 global GLOBAL_TRACE
 GLOBAL_TRACE = False
 
 # global GL_CARD_DECK
 GL_CARD_DECK = []
+GL_LOG_DECK = []
 
 
 # определение класса - карта;
@@ -109,8 +122,10 @@ class Card(object):
 
         return _tempI
 
+
 # КАКАЯ-ТО ХРЕНОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ. НЕ РАБОТАЕТ МЕЖДУ МОДУЛЯМИ
 GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
+
 
 # ---------------------------------------------------------------------------------------------
 class PrintStyle:
@@ -191,15 +206,6 @@ class DeckOfCards(object):
     def __len__(self):
         return len(self.list_of_cards)
 
-# тестируем производительность при списке в конце
-#     def get_first(self):
-#         return self.list_of_cards.pop(0) if len(self.list_of_cards) > 0 else Card(63)
-#
-#     def app_first(self, _app_card):
-#         self.list_of_cards.append(_app_card)
-#         return
-
-# --------------------------------------------------------------------------------------------------
 
 # определяем класс игровой стол (косынка)
 class GameTable(object):
@@ -248,7 +254,9 @@ class GameTable(object):
             self.search_moves()
             self.do_move()
             self.check_table()
-            print(self)
+
+            if GLOBAL_TRACE:
+                print(self)
 
         # проверяем сходимость после выхода из решения, раньше не стоит
         _desi = True
@@ -280,11 +288,9 @@ class GameTable(object):
         _all_card = len(_y)
         for _tempI in _y:
             _all_sum = _all_sum - _tempI.number()
+
         # включаем трасировку, если потеряли карту
         GLOBAL_TRACE = (_all_card != 52 or _all_sum)
-
-        #  логическое соответствие !!!!!!!!!!!!!!!
-
 
         if GLOBAL_TRACE:
             print('карт->', _all_card, 'сумма->', _all_sum)
@@ -322,7 +328,8 @@ class GameTable(object):
                     _card_to = _deck_to.see_first_card()
                     _card_to_e = _deck_to.see_end_card()
                     # закрытая стопка пуста
-                    _empty_inv_from = (self.play_invisible[self.play_visible.index(_deck_from)].see_first_card() == Card(63))
+                    _empty_inv_from = (
+                            self.play_invisible[self.play_visible.index(_deck_from)].see_first_card() == Card(63))
 
                     # проверим, что лежит единственной в колоде, чтобы цикл предотвратить
                     if _card_from == _card_from_e:
@@ -529,3 +536,114 @@ class Move(object):  # класс запись хода для удобства
         return self.card1 != other.card1 or self.card2 != other.card2
 
 
+# ---------------------------------------------------------------------------------------------------------------
+'''
+
+Функции работы с SQL сервером (mariaDB)
+
+'''
+
+
+# откроем БД
+def open_db():
+    connection = None
+    Error = []
+    try:
+        connection = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168',
+                                port=3306)
+    except Error as error:
+        print(f'Ошибка подключения к БД: {error}')
+    return connection
+
+
+#  закроем БД
+def close_db(connection=None):
+    if connection:
+        connection.commit()
+        connection.close()
+    return
+
+
+def get_debug(_id=0, _log_connection=None):
+    _x: GameTable
+    _x = GameTable()
+    if isinstance(id, int) and _log_connection:
+        _cur = _log_connection.cursor()
+        query = "SELECT ID_HASH, DECK_JSON FROM debug WHERE ID_HASH = {}".format(_id)
+
+        # if cur.fetchone():
+        #     query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
+        #         _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
+        # else:
+        #     query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
+        #         _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves)
+        # cur.execute(query)
+    return
+
+
+# сохранение р  аздачи с результатами
+async def log_deck(_in_table=GameTable(), the_end_=False):
+    _in_table: GameTable
+    if len(GL_LOG_DECK) > 1000 or the_end_:
+        # сохраняем в БД
+        _log_connection = open_db()
+        print('пошел сброс...')
+        while len(GL_LOG_DECK) != 0:
+            _in_table = GL_LOG_DECK.pop()
+            # готовим информацию к сохранению
+            _deck_num, _k = [], []
+            _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
+            # формируем словарь
+            _k = {i + 1: _deck_num[i] for i in range(52)}
+            _json = json.dumps(_k)
+
+            # проверим наличие такого ID
+            # '//vicdb:Qweqwe123_@'192.168.1.168:3306/ALLCARD'
+            _log_connection = await aiomysql.connect(db='ALLCARD', host='192.168.1.168', port=3306, user='vicdb',
+                                                     password='Qweqwe123_')
+            cur = await _log_connection.cursor()
+            query = "SELECT ID_HASH FROM gametables WHERE ID_HASH = {}".format(_in_table.start_hash)
+            await cur.execute(query)
+            if cur.fetchone():
+                query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
+                    _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
+            else:
+                query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
+                    _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves)
+            await cur.execute(query)
+            await cur.close()
+            _log_connection.close()
+    # храним в памяти
+    else:
+        GL_LOG_DECK.append(_in_table)
+    return
+
+
+#  сохранение информации об эксперименте
+async def log_trial(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
+    _log_connection = open_db()
+    _id = 0
+    cur = _log_connection.cursor()
+    _time_des_avg = round(_all_time / _all_steps, 3)
+
+    # соберем инфо по железу
+    _text = platform.system()
+    if _text == "Linux":
+        command = "cat /proc/cpuinfo"
+        all_info = subprocess.check_output(command, shell=True).decode().strip()
+        for line in all_info.split("\n"):
+            if "model name" in line:
+                _i = re.sub(".*model name.*:", "", line, 1)
+        _k = os.uname()
+        _text = '(' + _text + ', ' + _k[3] + '):' + _i + '; ' + _k[1]
+    # проверим наличие такого ID. Лишних проверок не делаем....
+    query = "SELECT MAX(ID) FROM attempts"
+    cur.execute(query)
+    _i = cur.fetchone()
+    _id = _i[0] + 1
+
+    query = "INSERT INTO attempts (ID, ALL_TIME, ALL_STEPS, TIME_DES_AVG, COUNT_WIN, AVG_WIN, NOTE) VALUES ({}, {}, {}, {}, {}, {}, '{}')".format(
+        _id, _all_time, _all_steps, _time_des_avg, _count_win, _avg_win, _text)
+    cur.execute(query)
+    close_db(_log_connection)
+    return
