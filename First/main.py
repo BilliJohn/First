@@ -30,19 +30,14 @@ GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
 def steps(_all_steps=0, _log_connection=None):
 
     if _all_steps:
+        _cursor, _k = 0, 0
+        # _time_only_decision = 0
         step_start = time.time()
-        _cursor = 0
-        _time_only_decision = 0
-        _k = 0
-        for _i in range(1, _all_steps + 1):
-            d = time.time()
+        for _tempI in range(1, _all_steps + 1):
             if do_one_table(_log_connection):
                 _k = _k + 1
-            # print(_i)
-
         _j = round(time.time() - step_start, 3)
-        # print('Итого:', _i, _j)
-        log_attemp(_log_connection, _j, _i, _k, round(_k/_i * 100, 2))
+        log_attemp(_log_connection, _j, _all_steps, _k, round(_k/_all_steps * 100, 2))
     return
 
 
@@ -52,7 +47,7 @@ def do_one_table(_log_connection=None):
     k = DeckOfCards()
     k.rand()
     _table = GameTable(k)
-    _table.decision_table()
+    _table.solve_table()
     log_deck(_table, _log_connection)
     return _table.win
 
@@ -70,7 +65,6 @@ if __name__ == '__main__':
     # close_db(_conn)
 
     print('THE END.')
-
 
 
 
@@ -94,7 +88,7 @@ if __name__ == '__main__':
 #     time2 = time.time()
 #     for _j in range(0, _k):
 #         for _i in range(0, 52):
-#             dva.list_of_cards.append(odin.list_of_cards.pop())
+#             dva.app_first(odin.get_first())
 #         dva.list_of_cards.reverse()
 #         odin, dva = dva, odin
 #     time2 = time.time() - time2

@@ -138,7 +138,6 @@ class DeckOfCards(object):
         elif isinstance(_input_list, int) and _input_list == 0:  # создаем пустой список
             self.list_of_cards = []
         else:  # ничего нет - даем 52 карты
-            # print(GL_CARD_DECK)
             self.list_of_cards = copy.deepcopy(GL_CARD_DECK)
             # self.list_of_cards.extend(Card(_i) for _i in range(0, 52))
 
@@ -192,6 +191,13 @@ class DeckOfCards(object):
     def __len__(self):
         return len(self.list_of_cards)
 
+# тестируем производительность при списке в конце
+#     def get_first(self):
+#         return self.list_of_cards.pop(0) if len(self.list_of_cards) > 0 else Card(63)
+#
+#     def app_first(self, _app_card):
+#         self.list_of_cards.append(_app_card)
+#         return
 
 # --------------------------------------------------------------------------------------------------
 
@@ -219,7 +225,7 @@ class GameTable(object):
         self.active_move = []
         self.move_history = []
         self.count_moves = 0
-        self.desicion_time = 0.0
+        self.solve_time = 0.0
         self.win = False
 
         if len(_input_deck) == 52:  # раздаем карты
@@ -234,7 +240,7 @@ class GameTable(object):
         return
 
     #  решение игрового стола
-    def decision_table(self):
+    def solve_table(self):
 
         time_start = time.time()
 
@@ -242,16 +248,16 @@ class GameTable(object):
             self.search_moves()
             self.do_move()
             self.check_table()
+            print(self)
 
-        # проверяем сходимость
+        # проверяем сходимость после выхода из решения, раньше не стоит
         _desi = True
-        for i in range(0,3):
+        for i in range(0, 3):
             _desi = _desi and len(self.play_off[i].list_of_cards) == 13
         if _desi:
-            # print('***********')
             self.win = True
 
-        self.desicion_time = round(time.time() - time_start, 5)
+        self.solve_time = round(time.time() - time_start, 5)
 
         return self.win
 

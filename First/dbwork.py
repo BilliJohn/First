@@ -36,10 +36,10 @@ def get_debug(_log_connection=None):
 
         if cur.fetchone():
             query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
-                _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves, _in_table.start_hash)
+                _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
         else:
             query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
-                _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves)
+                _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves)
         cur.execute(query)
     return
 
@@ -52,6 +52,7 @@ def log_deck(_in_table=cd.GameTable(), _log_connection=None):
         # готовим информацию к сохранению
         _deck_num, _k = [], []
         _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
+        # формируем словарь
         _k = {i + 1: _deck_num[i] for i in range(52)}
         _json = json.dumps(_k)
 
@@ -62,20 +63,21 @@ def log_deck(_in_table=cd.GameTable(), _log_connection=None):
 
         if cur.fetchone():
             query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
-                _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves, _in_table.start_hash)
+                _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
         else:
             query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
-                _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.desicion_time, _in_table.count_moves)
+                _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves)
         cur.execute(query)
     return
 
 
 #  сохранение информации об эксперименте
 def log_attemp(_log_connection=None, _all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
-    _id = 0
     if _log_connection:
+        _id = 0
         cur = _log_connection.cursor()
         _time_des_avg = round(_all_time / _all_steps, 3)
+
         # соберем инфо по железу
         _text = platform.system()
         if _text == "Linux":
@@ -86,7 +88,6 @@ def log_attemp(_log_connection=None, _all_time=0.0, _all_steps=1, _count_win=0, 
                     _i = re.sub(".*model name.*:", "", line, 1)
             _k = os.uname()
             _text = '(' + _text + ', ' + _k[3] + '):' + _i + '; ' + _k[1]
-
         # проверим наличие такого ID. Лишних проверок не делаем....
         query = "SELECT MAX(ID) FROM attempts"
         cur.execute(query)
