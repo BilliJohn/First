@@ -10,10 +10,13 @@ GL_LOG_DECK = []
 import time
 import sys
 from cardclass import GameTable, log_deck, log_trial
-# from cardclass import Card
+from cardclass import Card
 from cardclass import DeckOfCards
 
 import asyncio
+
+# КАКАЯ-ТО ХРЕНОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ. НЕ РАБОТАЕТ МЕЖДУ МОДУЛЯМИ
+GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
 
 
 #  проведение эксперимента с указанием количества попыток
@@ -25,7 +28,7 @@ async def steps(_all_steps=0):
         for _tempI in range(1, _all_steps + 1):
             if await do_one_table():
                 _k = _k + 1
-        _j = round(time.time() - step_start, 3)
+        _j = round(time.time() - step_start, 5)
         await log_deck(0, True)
         await log_trial(_j, _all_steps, _k, round(_k / _all_steps * 100, 2))
     return
@@ -33,8 +36,7 @@ async def steps(_all_steps=0):
 
 #  решение одной раздачи c генерацией
 async def do_one_table():
-    k = DeckOfCards()
-    k.rand()
+    k = DeckOfCards([], True)
     _table = GameTable(k)
     _table.solve_table()
     await log_deck(_table)
@@ -47,7 +49,8 @@ if __name__ == '__main__':
     # не сильно заморачиваемся с обработкой параметров
     _param = sys.argv
     _i = 1000 if len(_param) == 1 else 10 ** (len(_param[1])-1)
-
     asyncio.run(steps(_i))
     print('THE END.')
+
+    # asyncio.
 

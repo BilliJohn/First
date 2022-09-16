@@ -12,6 +12,7 @@ import time
 import pymysql as db
 import json
 import os, platform, subprocess, re
+import random
 
 # import aiosql
 # import aiosqlite
@@ -141,7 +142,7 @@ class PrintStyle:
 class DeckOfCards(object):
     # global GL_CARD_DECK
 
-    def __init__(self, _input_list=[]):  # при инициации, или входной список или последовательный набор карт
+    def __init__(self, _input_list=[], _random=False):  # при инициации, или входной список или последовательный набор карт
         # global GL_CARD_DECK
 
         self.list_of_cards = []
@@ -154,6 +155,9 @@ class DeckOfCards(object):
             self.list_of_cards = []
         else:  # ничего нет - даем 52 карты
             self.list_of_cards = copy.deepcopy(GL_CARD_DECK)
+            if _random:
+                random.shuffle(self.list_of_cards)
+
             # self.list_of_cards.extend(Card(_i) for _i in range(0, 52))
 
         return
@@ -233,6 +237,7 @@ class GameTable(object):
         self.count_moves = 0
         self.solve_time = 0.0
         self.win = False
+        self.double_id = False
 
         if len(_input_deck) == 52:  # раздаем карты
             _x = 0
@@ -586,33 +591,36 @@ async def log_deck(_in_table=GameTable(), the_end_=False):
     _in_table: GameTable
     if len(GL_LOG_DECK) > 1000 or the_end_:
         # сохраняем в БД
-        _log_connection = open_db()
         print('пошел сброс...')
+        time_dump = time.time()
         while len(GL_LOG_DECK) != 0:
             _in_table = GL_LOG_DECK.pop()
             # готовим информацию к сохранению
-            _deck_num, _k = [], []
-            _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
+            _k = []
+            # _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
             # формируем словарь
-            _k = {i + 1: _deck_num[i] for i in range(52)}
+            _k = {i + 1: _in_table.start_deck.list_of_cards[i].number() for i in range(52)}
             _json = json.dumps(_k)
 
             # проверим наличие такого ID
-            # '//vicdb:Qweqwe123_@'192.168.1.168:3306/ALLCARD'
             _log_connection = await aiomysql.connect(db='ALLCARD', host='192.168.1.168', port=3306, user='vicdb',
                                                      password='Qweqwe123_')
             cur = await _log_connection.cursor()
             query = "SELECT ID_HASH FROM gametables WHERE ID_HASH = {}".format(_in_table.start_hash)
             await cur.execute(query)
             if cur.fetchone():
-                query = "UPDATE gametables SET DECISION={}, CARD_DECK='{}', DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
-                    _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
+                query = "UPDATE gametables SET DECISION={}, DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
+                    _in_table.win, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
             else:
-                query = "INSERT INTO gametables(ID_HASH, DECISION,  CARD_DECK, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
-                    _in_table.start_hash, _in_table.win, _deck_num, _json, _in_table.solve_time, _in_table.count_moves)
+                query = "INSERT INTO gametables(ID_HASH, DECISION, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
+                    _in_table.start_hash, _in_table.win, _json, _in_table.solve_time, _in_table.count_moves)
+            # print('начало     ID: ', _in_table.start_hash)
             await cur.execute(query)
+            # await asyncio.sleep(0.4)
             await cur.close()
+            # print('завершение ID: ', _in_table.start_hash)
             _log_connection.close()
+        print('время сброса: ' + str(round(time.time() - time_dump, 5)))
     # храним в памяти
     else:
         GL_LOG_DECK.append(_in_table)
@@ -624,7 +632,7 @@ async def log_trial(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
     _log_connection = open_db()
     _id = 0
     cur = _log_connection.cursor()
-    _time_des_avg = round(_all_time / _all_steps, 3)
+    _time_des_avg = round(_all_time / _all_steps, 5)
 
     # соберем инфо по железу
     _text = platform.system()
