@@ -1,40 +1,33 @@
-'''
+"""
 
 классы по работе с картами
 
-'''
+"""
 
 import copy
+import multiprocessing as mp
+import os
+import platform
 import random
+import re
+import subprocess
 import time
-
-# from pymysql import  connector as db
 import pymysql as db
-import json
-import os, platform, subprocess, re
-import random
 
-# import aiosql
-# import aiosqlite
-# import aiom
-
-import asyncio
-import aiomysql
-
-global GLOBAL_TRACE
-GLOBAL_TRACE = False
+# global flag_debug
+# gl_log_deck = mp.Queue()
 
 # global GL_CARD_DECK
-GL_CARD_DECK = []
-GL_LOG_DECK = []
+# GL_CARD_DECK = []
 
 
-# определение класса - карта;
-#  0000 - значение + 00 - масть. От 0 до 51
-#  63 (111111) - признак пустой карты
+'''
+определение класса - карта;
+    0000 - значение + 00 - масть. От 0 до 51
+    63 (111111) - признак пустой карты 
+'''
 
 
-# ------------------------------------------------------------------------------------------
 class Card(object):
     def __init__(self, input_x=None):
         self.card_num = None  # номер карты
@@ -66,7 +59,7 @@ class Card(object):
         return self.suit() % 2 == _card.suit() % 2
 
     # следующая карта
-    def next_card_for(self, _card: object) -> object:
+    def next_card_for(self, _card) -> object:
         return (_card.range() - self.range() == 1) or (_card.range() == 0 and self.range() == 12)
 
     # расшифровка карты
@@ -125,6 +118,7 @@ class Card(object):
 
 
 # КАКАЯ-ТО ХРЕНОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ. НЕ РАБОТАЕТ МЕЖДУ МОДУЛЯМИ
+GL_CARD_DECK = []
 GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
 
 
@@ -142,7 +136,8 @@ class PrintStyle:
 class DeckOfCards(object):
     # global GL_CARD_DECK
 
-    def __init__(self, _input_list=[], _random=False):  # при инициации, или входной список или последовательный набор карт
+    def __init__(self, _input_list=None,
+                 _random=False):  # при инициации, или входной список или последовательный набор карт
         # global GL_CARD_DECK
 
         self.list_of_cards = []
@@ -229,9 +224,11 @@ class GameTable(object):
         # 25 - сносов не было
         self.count_stack = 100
         self.play_visible = []
-        for _tempI in range(7):  self.play_visible.append(DeckOfCards(0))
+        for _tempI in range(7):
+            self.play_visible.append(DeckOfCards(0))
         self.play_invisible = []
-        for _tempI in range(7):  self.play_invisible.append(DeckOfCards(0))
+        for _tempI in range(7):
+            self.play_invisible.append(DeckOfCards(0))
         self.active_move = []
         self.move_history = []
         self.count_moves = 0
@@ -260,8 +257,8 @@ class GameTable(object):
             self.do_move()
             self.check_table()
 
-            if GLOBAL_TRACE:
-                print(self)
+            # if flag_debug.is_set():
+            #     print(self)
 
         # проверяем сходимость после выхода из решения, раньше не стоит
         _desi = True
@@ -276,7 +273,7 @@ class GameTable(object):
 
     # проверка игрового стола, ничего не пропало
     def check_table(self):
-
+        # global flag_debug
         _all_sum = 1326
         _message = '\nО!->'
         _all_card = 0
@@ -294,16 +291,18 @@ class GameTable(object):
         for _tempI in _y:
             _all_sum = _all_sum - _tempI.number()
 
-        # включаем трасировку, если потеряли карту
-        GLOBAL_TRACE = (_all_card != 52 or _all_sum)
-
-        if GLOBAL_TRACE:
-            print('карт->', _all_card, 'сумма->', _all_sum)
-            # print(_message)
+        # включаем трасировку, если потеряли карт
+        # if _all_card != 52 or _all_sum:
+        #     flag_debug.set()
+        #
+        # if flag_debug.is_set():
+        #     print('карт->', _all_card, 'сумма->', _all_sum)
+        #     print(_message)
         return
 
     # анализ текущего состояния и поиск возможных ходов
     def search_moves(self):  # ищем активные шаги
+        # global flag_debugflag_debug
         # первый проход
         if self.count_stack == 100:
             self.count_stack = 50
@@ -346,8 +345,8 @@ class GameTable(object):
                                           'vis', self.play_visible.index(_deck_to),
                                           _deck_to.list_of_cards.index(_card_to), _card_to)
                     # то же, но для последней карты....
-                    if (not _card_from_e.same_color(_card_to)) and _card_from_e.next_card_for(_card_to) and \
-                            _card_to.range() != 12:
+                    if (not _card_from_e.same_color(_card_to)) and _card_from_e.next_card_for(_card_to) \
+                            and _card_to.range() != 12:
                         self.add_move('vis', self.play_visible.index(_deck_from),
                                       _deck_from.list_of_cards.index(_card_from_e), _card_from_e,
                                       'vis', self.play_visible.index(_deck_to), 0, _card_to)
@@ -358,7 +357,7 @@ class GameTable(object):
                                       'vis', self.play_visible.index(_deck_to), 0, _card_to)
                     # самое интересное, дорабатываем напильником
                     elif len(self.active_move) == 0:
-                        q = 0
+                        _ = 0
                         # ввести новый аттрибут - цикличный ход
                         # повторно пройти через все карты виз. Анализ вывести в отдельную функцию
                         #   не забыть о возможности обратного сноса
@@ -398,15 +397,15 @@ class GameTable(object):
                 elif self.count_stack == 25:
                     self.count_stack = 0
 
-        if GLOBAL_TRACE:
-            _x = 'Х-> '
-            for _tempI in self.active_move:
-                _x = _x + _tempI.__str__()
-            print(_x)
+        # if flag_debug.is_set():
+        #     _x = 'Х-> '
+        #     for _tempI in self.active_move:
+        #         _x = _x + _tempI.__str__()
+        #     print(_x)
 
         return
 
-    def add_move(self, f1='', f2=0, f3=0, f4='', t='', t2=0, t3=0, t4=''):
+    def add_move(self, f1='', f2=0, f3=0, f4=Card(63), t='', t2=0, t3=0, t4=Card(63)):
         self.active_move.append(Move(f1, f2, f3, f4, t, t2, t3, t4))
         # нашли ход, счетчик проходов обнулим
         self.count_stack = 50
@@ -453,11 +452,11 @@ class GameTable(object):
             if len(self.play_visible[_tempI]) == 0 and len(self.play_invisible[_tempI]) != 0:
                 self.play_visible[_tempI].app_first_card(self.play_invisible[_tempI].get_first_card())
 
-        if GLOBAL_TRACE:
-            _x = 'И-> '
-            for _tempI in self.move_history:
-                _x = _x + _tempI.__str__()
-            print(_x)
+        # if flag_debug.is_set():
+        #     _x = 'И-> '
+        #     for _tempI in self.move_history:
+        #         _x = _x + _tempI.__str__()
+        #     print(_x)
         return
 
         # приведение стола в порядок после хода
@@ -519,16 +518,16 @@ class GameTable(object):
 # ------------------------------------------------------------------------------------------
 class Move(object):  # класс запись хода для удобства
 
-    def __init__(self, _fromN='non', _fromI=0, _fromJ=0, _card1=Card(63), _toN='non', _toI=0, _toJ=0, _card2=Card(63)):
+    def __init__(self, from_n='non', from_i=0, from_j=0, card1=Card(63), to_n='non', to_i=0, to_j=0, card2=Card(63)):
         # 'off', 'vis', 'stk'
-        self.from_name = _fromN
-        self.from_i = _fromI
-        self.from_j = _fromJ
-        self.card1 = _card1
-        self.to_name = _toN
-        self.to_i = _toI
-        self.to_j = _toJ
-        self.card2 = _card2
+        self.from_name = from_n
+        self.from_i = from_i
+        self.from_j = from_j
+        self.card1 = card1
+        self.to_name = to_n
+        self.to_i = to_i
+        self.to_j = to_j
+        self.card2 = card2
         return
 
     def __str__(self):
@@ -549,24 +548,6 @@ class Move(object):  # класс запись хода для удобства
 '''
 
 
-# откроем БД
-def open_db():
-    connection = None
-    Error = []
-    try:
-        connection = db.connect(user='vicdb', password='Qweqwe123_', database='ALLCARD', host='192.168.1.168',
-                                port=3306)
-    except Error as error:
-        print(f'Ошибка подключения к БД: {error}')
-    return connection
-
-
-#  закроем БД
-def close_db(connection=None):
-    if connection:
-        connection.commit()
-        connection.close()
-    return
 
 
 def get_debug(_id=0, _log_connection=None):
@@ -586,72 +567,3 @@ def get_debug(_id=0, _log_connection=None):
     return
 
 
-# сохранение р  аздачи с результатами
-async def log_deck(_in_table=GameTable(), the_end_=False):
-    _in_table: GameTable
-    if len(GL_LOG_DECK) > 1000 or the_end_:
-        # сохраняем в БД
-        print('пошел сброс...')
-        time_dump = time.time()
-        while len(GL_LOG_DECK) != 0:
-            _in_table = GL_LOG_DECK.pop()
-            # готовим информацию к сохранению
-            _k = []
-            # _deck_num.extend(_in_table.start_deck.list_of_cards[i].number() for i in range(0, 52))
-            # формируем словарь
-            _k = {i + 1: _in_table.start_deck.list_of_cards[i].number() for i in range(52)}
-            _json = json.dumps(_k)
-
-            # проверим наличие такого ID
-            _log_connection = await aiomysql.connect(db='ALLCARD', host='192.168.1.168', port=3306, user='vicdb',
-                                                     password='Qweqwe123_')
-            cur = await _log_connection.cursor()
-            query = "SELECT ID_HASH FROM gametables WHERE ID_HASH = {}".format(_in_table.start_hash)
-            await cur.execute(query)
-            if cur.fetchone():
-                query = "UPDATE gametables SET DECISION={}, DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
-                    _in_table.win, _json, _in_table.solve_time, _in_table.count_moves, _in_table.start_hash)
-            else:
-                query = "INSERT INTO gametables(ID_HASH, DECISION, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', '{}', {}, {})".format(
-                    _in_table.start_hash, _in_table.win, _json, _in_table.solve_time, _in_table.count_moves)
-            # print('начало     ID: ', _in_table.start_hash)
-            await cur.execute(query)
-            # await asyncio.sleep(0.4)
-            await cur.close()
-            # print('завершение ID: ', _in_table.start_hash)
-            _log_connection.close()
-        print('время сброса: ' + str(round(time.time() - time_dump, 5)))
-    # храним в памяти
-    else:
-        GL_LOG_DECK.append(_in_table)
-    return
-
-
-#  сохранение информации об эксперименте
-async def log_trial(_all_time=0.0, _all_steps=1, _count_win=0, _avg_win=0):
-    _log_connection = open_db()
-    _id = 0
-    cur = _log_connection.cursor()
-    _time_des_avg = round(_all_time / _all_steps, 5)
-
-    # соберем инфо по железу
-    _text = platform.system()
-    if _text == "Linux":
-        command = "cat /proc/cpuinfo"
-        all_info = subprocess.check_output(command, shell=True).decode().strip()
-        for line in all_info.split("\n"):
-            if "model name" in line:
-                _i = re.sub(".*model name.*:", "", line, 1)
-        _k = os.uname()
-        _text = '(' + _text + ', ' + _k[3] + '):' + _i + '; ' + _k[1]
-    # проверим наличие такого ID. Лишних проверок не делаем....
-    query = "SELECT MAX(ID) FROM attempts"
-    cur.execute(query)
-    _i = cur.fetchone()
-    _id = _i[0] + 1
-
-    query = "INSERT INTO attempts (ID, ALL_TIME, ALL_STEPS, TIME_DES_AVG, COUNT_WIN, AVG_WIN, NOTE) VALUES ({}, {}, {}, {}, {}, {}, '{}')".format(
-        _id, _all_time, _all_steps, _time_des_avg, _count_win, _avg_win, _text)
-    cur.execute(query)
-    close_db(_log_connection)
-    return
