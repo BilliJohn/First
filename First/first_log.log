@@ -81,3 +81,300 @@
 2022-09-18 00:51:08,120 INFO ForkProcess-3: logger stop (3.1741)
 2022-09-18 00:51:10,299 INFO MainProcess: Stop 
 2022-09-18 00:51:10,300 INFO Stop, всего 10000
+2022-09-18 13:29:24,128 INFO Start
+2022-09-18 13:29:24,128 INFO MainProcess: Start 
+2022-09-18 13:29:24,141 INFO ForkProcess-1: generator start...
+2022-09-18 13:29:24,144 INFO ForkProcess-4: logger start...
+2022-09-18 13:29:24,145 INFO ForkProcess-2: solving start 
+2022-09-18 13:29:24,147 INFO ForkProcess-3: solving start 
+2022-09-18 13:29:24,149 INFO ForkProcess-1: generator stop
+2022-09-18 13:29:24,150 INFO ForkProcess-1: solving start 
+2022-09-18 13:29:24,209 INFO ForkProcess-1: solving stop 
+2022-09-18 13:29:24,210 INFO ForkProcess-1: solving start 
+2022-09-18 13:29:24,210 INFO ForkProcess-1: solving stop 
+2022-09-18 13:29:24,210 INFO ForkProcess-1: logger start...
+2022-09-18 13:29:24,217 INFO ForkProcess-3: solving stop 
+2022-09-18 13:29:24,217 INFO ForkProcess-3: logger start...
+2022-09-18 13:29:24,217 INFO ForkProcess-2: solving stop 
+2022-09-18 13:29:24,217 INFO ForkProcess-2: logger start...
+2022-09-18 13:29:24,556 INFO ForkProcess-2: logger stop (0.3385)
+2022-09-18 13:29:24,596 INFO ForkProcess-1: logger stop (0.3857)
+2022-09-18 13:29:30,460 INFO ForkProcess-3: logger stop (6.243)
+2022-09-18 13:29:30,460 INFO ForkProcess-4: logger stop (6.3159)
+2022-09-18 13:36:24,022 INFO Start
+2022-09-18 13:36:24,022 INFO MainProcess: Start 
+2022-09-18 13:36:24,049 INFO ForkProcess-1: generator start...
+2022-09-18 13:36:24,050 INFO ForkProcess-4: logger start...
+2022-09-18 13:36:24,050 INFO ForkProcess-2: solving start 
+2022-09-18 13:36:24,052 INFO ForkProcess-3: solving start 
+2022-09-18 13:36:24,052 INFO ForkProcess-1: generator stop
+2022-09-18 13:36:24,053 INFO ForkProcess-1: solving start 
+2022-09-18 13:36:24,053 INFO ForkProcess-1: solving stop 
+2022-09-18 13:36:24,053 INFO ForkProcess-1: solving start 
+2022-09-18 13:36:24,053 INFO ForkProcess-1: solving stop 
+2022-09-18 13:36:24,053 INFO ForkProcess-1: logger start...
+2022-09-18 13:36:24,065 INFO ForkProcess-3: logger start...
+2022-09-18 13:36:24,084 INFO ForkProcess-2: solving stop 
+2022-09-18 13:36:24,084 INFO ForkProcess-2: logger start...
+2022-09-18 13:36:24,279 INFO ForkProcess-1: logger stop (0.2261)
+2022-09-18 13:36:30,407 INFO ForkProcess-2: logger stop (6.3228)
+2022-09-18 13:36:46,735 INFO Start
+2022-09-18 13:36:46,735 INFO MainProcess: Start 
+2022-09-18 13:36:46,739 INFO ForkProcess-1: generator start...
+2022-09-18 13:36:46,739 INFO ForkProcess-2: logger start...
+2022-09-18 13:36:46,741 INFO ForkProcess-1: generator stop
+2022-09-18 13:36:46,742 INFO ForkProcess-1: solving start 
+2022-09-18 13:36:46,743 INFO ForkProcess-3: solving start 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: solving stop 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: solving start 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: solving stop 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: solving start 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: solving stop 
+2022-09-18 13:36:46,744 INFO ForkProcess-3: logger start...
+2022-09-18 13:36:46,746 INFO ForkProcess-4: logger start...
+2022-09-18 13:36:46,763 INFO ForkProcess-1: solving stop 
+2022-09-18 13:36:46,764 INFO ForkProcess-1: logger start...
+2022-09-18 13:36:46,917 INFO ForkProcess-3: logger stop (0.1727)
+2022-09-18 13:36:52,840 INFO ForkProcess-1: logger stop (6.076)
+2022-09-18 13:36:52,976 INFO MainProcess: Stop 
+2022-09-18 13:36:52,977 INFO Stop, всего 1
+2022-09-18 13:37:19,123 INFO Start
+2022-09-18 13:37:19,124 INFO MainProcess: Start 
+2022-09-18 13:37:19,129 INFO ForkProcess-1: generator start...
+2022-09-18 13:37:19,131 INFO ForkProcess-3: logger start...
+2022-09-18 13:37:19,131 INFO ForkProcess-2: solving start 
+2022-09-18 13:37:19,132 INFO ForkProcess-4: solving start 
+2022-09-18 13:37:19,136 INFO ForkProcess-1: generator stop
+2022-09-18 13:37:19,136 INFO ForkProcess-1: solving start 
+2022-09-18 13:37:19,137 INFO ForkProcess-1: solving stop 
+2022-09-18 13:37:19,137 INFO ForkProcess-1: solving start 
+2022-09-18 13:37:19,137 INFO ForkProcess-1: solving stop 
+2022-09-18 13:37:19,137 INFO ForkProcess-1: logger start...
+2022-09-18 13:37:19,144 INFO ForkProcess-4: logger start...
+2022-09-18 13:37:19,164 INFO ForkProcess-2: solving stop 
+2022-09-18 13:37:19,164 INFO ForkProcess-2: logger start...
+2022-09-18 13:37:19,324 INFO ForkProcess-1: logger stop (0.187)
+2022-09-18 13:37:25,191 INFO ForkProcess-2: logger stop (6.0268)
+2022-09-18 13:37:25,302 INFO MainProcess: Stop 
+2022-09-18 13:37:25,304 INFO Stop, всего 1
+2022-09-18 13:37:56,659 INFO Start
+2022-09-18 13:37:56,659 INFO MainProcess: Start 
+2022-09-18 13:37:56,669 INFO ForkProcess-1: generator start...
+2022-09-18 13:37:56,670 INFO ForkProcess-3: solving start 
+2022-09-18 13:37:56,670 INFO ForkProcess-4: logger start...
+2022-09-18 13:37:56,671 INFO ForkProcess-2: solving start 
+2022-09-18 13:37:56,679 INFO ForkProcess-1: generator stop
+2022-09-18 13:37:56,679 INFO ForkProcess-1: solving start 
+2022-09-18 13:37:56,679 INFO ForkProcess-1: solving stop 
+2022-09-18 13:37:56,680 INFO ForkProcess-1: solving start 
+2022-09-18 13:37:56,680 INFO ForkProcess-1: solving stop 
+2022-09-18 13:37:56,680 INFO ForkProcess-1: logger start...
+2022-09-18 13:37:56,684 INFO ForkProcess-2: logger start...
+2022-09-18 13:37:56,962 INFO ForkProcess-3: solving stop 
+2022-09-18 13:37:56,963 INFO ForkProcess-3: logger start...
+2022-09-18 13:37:57,010 INFO ForkProcess-4: logger stop (0.3403)
+2022-09-18 13:38:01,911 INFO ForkProcess-1: logger stop (5.2312)
+2022-09-18 13:38:02,979 INFO ForkProcess-3: logger stop (6.0162)
+2022-09-18 13:38:03,087 INFO MainProcess: Stop 
+2022-09-18 13:38:03,088 INFO Stop, всего 10
+2022-09-18 13:38:36,079 INFO Start
+2022-09-18 13:38:36,079 INFO MainProcess: Start 
+2022-09-18 13:38:36,088 INFO ForkProcess-1: generator start...
+2022-09-18 13:38:36,089 INFO ForkProcess-2: logger start...
+2022-09-18 13:38:36,089 INFO ForkProcess-3: solving start 
+2022-09-18 13:38:36,089 INFO ForkProcess-4: solving start 
+2022-09-18 13:38:36,143 INFO ForkProcess-1: generator stop
+2022-09-18 13:38:36,145 INFO ForkProcess-1: solving start 
+2022-09-18 13:38:37,300 INFO ForkProcess-3: solving stop 
+2022-09-18 13:38:37,300 INFO ForkProcess-3: solving start 
+2022-09-18 13:38:37,300 INFO ForkProcess-3: solving stop 
+2022-09-18 13:38:37,300 INFO ForkProcess-3: logger start...
+2022-09-18 13:38:37,303 INFO ForkProcess-4: solving stop 
+2022-09-18 13:38:37,303 INFO ForkProcess-4: logger start...
+2022-09-18 13:38:37,311 INFO ForkProcess-1: solving stop 
+2022-09-18 13:38:37,312 INFO ForkProcess-1: logger start...
+2022-09-18 13:38:37,454 INFO ForkProcess-2: logger stop (1.3654)
+2022-09-18 13:38:37,496 INFO ForkProcess-3: logger stop (0.1953)
+2022-09-18 13:38:37,496 INFO ForkProcess-1: logger stop (0.1833)
+2022-09-18 13:38:43,341 INFO ForkProcess-4: logger stop (6.0379)
+2022-09-18 13:38:43,489 INFO MainProcess: Stop 
+2022-09-18 13:38:43,490 INFO Stop, всего 100
+2022-09-18 13:52:47,167 INFO Start
+2022-09-18 13:52:47,167 INFO MainProcess: Start 
+2022-09-18 13:52:47,177 INFO ForkProcess-1: generator start...
+2022-09-18 13:52:47,179 INFO ForkProcess-4: logger start...
+2022-09-18 13:52:47,180 INFO ForkProcess-2: solving start 
+2022-09-18 13:52:47,181 INFO ForkProcess-3: solving start 
+2022-09-18 13:52:47,192 INFO ForkProcess-2: solving start 
+2022-09-18 13:52:47,197 INFO ForkProcess-3: solving start 
+2022-09-18 13:52:47,278 INFO ForkProcess-1: generator stop
+2022-09-18 13:52:47,278 INFO ForkProcess-1: logger start...
+2022-09-18 13:52:49,305 INFO ForkProcess-3: solving stop 
+2022-09-18 13:52:49,306 INFO ForkProcess-3: logger start...
+2022-09-18 13:52:49,309 INFO ForkProcess-2: solving stop 
+2022-09-18 13:52:49,310 INFO ForkProcess-2: logger start...
+2022-09-18 13:52:49,324 INFO ForkProcess-4: logger stop (2.146)
+2022-09-18 13:52:49,399 INFO ForkProcess-1: logger stop (2.1214)
+2022-09-18 13:52:49,441 INFO ForkProcess-2: logger stop (0.1312)
+2022-09-18 13:52:49,441 INFO ForkProcess-3: logger stop (0.1354)
+2022-09-18 13:52:54,668 INFO MainProcess: Stop 
+2022-09-18 13:52:54,669 INFO Stop, всего 100
+2022-09-18 15:11:20,431 INFO Start
+2022-09-18 15:11:20,431 INFO MainProcess: Start 
+2022-09-18 15:11:20,440 INFO ForkProcess-1: generator start...
+2022-09-18 15:11:20,442 INFO ForkProcess-2: logger start...
+2022-09-18 15:11:20,445 INFO ForkProcess-3: solving start 
+2022-09-18 15:11:20,452 INFO ForkProcess-4: solving start 
+2022-09-18 15:11:20,457 INFO ForkProcess-3: solving start 
+2022-09-18 15:13:14,050 INFO ForkProcess-1: generator stop
+2022-09-18 15:13:14,050 INFO ForkProcess-1: solving start 
+2022-09-18 15:13:25,143 INFO ForkProcess-1: solving stop 
+2022-09-18 15:13:25,143 INFO ForkProcess-1: logger start...
+2022-09-18 15:13:25,174 INFO ForkProcess-3: solving stop 
+2022-09-18 15:13:25,175 INFO ForkProcess-3: logger start...
+2022-09-18 15:13:25,181 INFO ForkProcess-4: solving stop 
+2022-09-18 15:13:25,181 INFO ForkProcess-4: logger start...
+2022-09-18 15:13:25,923 INFO ForkProcess-2: logger stop (125.4816)
+2022-09-18 15:13:25,995 INFO ForkProcess-3: logger stop (0.8208)
+2022-09-18 15:13:25,995 INFO ForkProcess-4: logger stop (0.8146)
+2022-09-18 15:13:31,613 INFO MainProcess: Stop 
+2022-09-18 15:13:31,614 INFO Stop, всего 10000
+2022-09-18 15:16:01,882 INFO Start
+2022-09-18 15:16:01,882 INFO MainProcess: Start 
+2022-09-18 15:16:01,892 INFO ForkProcess-1: generator start...
+2022-09-18 15:16:01,896 INFO ForkProcess-2: logger start...
+2022-09-18 15:16:01,902 INFO ForkProcess-4: solving start 
+2022-09-18 15:16:01,902 INFO ForkProcess-3: solving start 
+2022-09-18 15:26:17,173 INFO ForkProcess-1: generator stop
+2022-09-18 15:26:17,175 INFO ForkProcess-1: solving start 
+2022-09-18 15:26:28,524 INFO ForkProcess-3: solving stop 
+2022-09-18 15:26:28,526 INFO ForkProcess-3: solving start 
+2022-09-18 15:26:28,527 INFO ForkProcess-3: solving stop 
+2022-09-18 15:26:28,527 INFO ForkProcess-3: logger start...
+2022-09-18 15:26:28,527 INFO ForkProcess-4: solving stop 
+2022-09-18 15:26:28,528 INFO ForkProcess-4: logger start...
+2022-09-18 15:26:28,537 INFO ForkProcess-1: solving stop 
+2022-09-18 15:26:28,537 INFO ForkProcess-1: logger start...
+2022-09-18 15:26:28,836 INFO ForkProcess-2: logger stop (626.9396)
+2022-09-18 15:26:45,465 INFO ForkProcess-4: logger stop (16.937)
+2022-09-18 15:26:45,465 INFO ForkProcess-1: logger stop (16.9279)
+2022-09-18 15:26:45,465 INFO ForkProcess-3: logger stop (16.938)
+2022-09-18 15:26:46,659 INFO MainProcess: Stop 
+2022-09-18 15:26:46,660 INFO Stop, всего 50000
+2022-09-18 15:27:53,582 INFO Start
+2022-09-18 15:27:53,582 INFO MainProcess: Start 
+2022-09-18 15:27:53,585 INFO ForkProcess-1: generator start...
+2022-09-18 15:27:53,591 INFO ForkProcess-3: solving start 
+2022-09-18 15:27:53,588 INFO ForkProcess-2: logger start...
+2022-09-18 15:27:53,595 INFO ForkProcess-4: solving start 
+2022-09-18 15:30:00,518 INFO ForkProcess-2: solving start 
+2022-09-18 15:37:12,861 INFO ForkProcess-1: generator stop
+2022-09-18 15:37:12,861 INFO ForkProcess-1: solving start 
+2022-09-18 15:37:23,351 INFO ForkProcess-2: solving stop 
+2022-09-18 15:37:23,351 INFO ForkProcess-2: logger start...
+2022-09-18 15:37:23,354 INFO ForkProcess-4: solving stop 
+2022-09-18 15:37:23,355 INFO ForkProcess-4: logger start...
+2022-09-18 15:37:23,367 INFO ForkProcess-1: solving stop 
+2022-09-18 15:37:23,367 INFO ForkProcess-1: logger start...
+2022-09-18 15:37:23,368 INFO ForkProcess-3: solving stop 
+2022-09-18 15:43:10,760 INFO ForkProcess-4: logger stop (347.4058)
+2022-09-18 15:43:11,453 INFO MainProcess: Stop 
+2022-09-18 15:43:11,453 INFO Stop, всего 50000
+2022-09-18 15:47:00,630 INFO Start
+2022-09-18 15:47:00,631 INFO MainProcess: Start 
+2022-09-18 15:47:00,641 INFO ForkProcess-2: logger start...
+2022-09-18 15:47:00,643 INFO ForkProcess-3: generator start...
+2022-09-18 15:47:00,643 INFO ForkProcess-1: solving start 
+2022-09-18 15:47:00,643 INFO ForkProcess-4: solving start 
+2022-09-18 15:55:50,065 INFO ForkProcess-2: solving start 
+2022-09-18 15:59:01,658 INFO ForkProcess-3: generator stop
+2022-09-18 15:59:01,659 INFO ForkProcess-3: logger start...
+2022-09-18 15:59:17,406 INFO ForkProcess-2: solving stop 
+2022-09-18 15:59:17,407 INFO ForkProcess-2: logger start...
+2022-09-18 15:59:17,421 INFO ForkProcess-4: solving stop 
+2022-09-18 15:59:17,421 INFO ForkProcess-4: logger start...
+2022-09-18 15:59:17,426 INFO ForkProcess-1: solving stop 
+2022-09-18 15:59:33,267 INFO ForkProcess-4: logger stop (15.8463)
+2022-09-18 16:01:09,930 INFO ForkProcess-2: logger stop (112.5233)
+2022-09-18 16:01:10,438 INFO MainProcess: Stop 
+2022-09-18 16:01:10,440 INFO Stop, всего 50000
+2022-09-18 16:06:12,775 INFO Start
+2022-09-18 16:06:12,775 INFO MainProcess: Start 
+2022-09-18 16:06:12,780 INFO ForkProcess-1: logger start...
+2022-09-18 16:06:12,784 INFO ForkProcess-3: solving start 
+2022-09-18 16:06:12,784 INFO ForkProcess-2: generator start...
+2022-09-18 16:06:12,789 INFO ForkProcess-4: solving start 
+2022-09-18 16:16:48,124 INFO ForkProcess-2: generator stop
+2022-09-18 16:16:48,124 INFO ForkProcess-2: solving start 
+2022-09-18 16:17:02,096 INFO ForkProcess-2: solving stop 
+2022-09-18 16:17:02,096 INFO ForkProcess-2: logger start...
+2022-09-18 16:17:02,117 INFO ForkProcess-4: solving stop 
+2022-09-18 16:17:02,117 INFO ForkProcess-4: logger start...
+2022-09-18 16:17:02,118 INFO ForkProcess-3: solving stop 
+2022-09-18 16:17:02,118 INFO ForkProcess-3: logger start...
+2022-09-18 16:17:04,578 INFO ForkProcess-1: logger stop (651.7983)
+2022-09-18 16:17:04,578 INFO ForkProcess-4: logger stop (2.4612)
+2022-09-18 16:17:09,522 INFO ForkProcess-3: logger stop (7.4037)
+2022-09-18 16:17:09,597 INFO ForkProcess-2: logger stop (7.5008)
+2022-09-18 16:17:09,724 INFO MainProcess: Stop 
+2022-09-18 16:17:09,725 INFO Stop, всего 50000
+2022-09-18 16:22:29,915 INFO Start
+2022-09-18 16:22:29,916 INFO MainProcess: Start 
+2022-09-18 16:22:29,921 INFO ForkProcess-1: logger start...
+2022-09-18 16:22:29,925 INFO ForkProcess-2: generator start...
+2022-09-18 16:22:29,925 INFO ForkProcess-3: solving start 
+2022-09-18 16:22:29,927 INFO ForkProcess-4: solving start 
+2022-09-18 16:24:19,803 INFO ForkProcess-2: generator stop
+2022-09-18 16:24:19,804 INFO ForkProcess-2: solving start 
+2022-09-18 16:24:31,248 INFO ForkProcess-2: solving stop 
+2022-09-18 16:24:31,248 INFO ForkProcess-2: logger start...
+2022-09-18 16:24:31,249 INFO ForkProcess-3: solving stop 
+2022-09-18 16:24:31,249 INFO ForkProcess-3: logger start...
+2022-09-18 16:24:31,258 INFO ForkProcess-4: solving stop 
+2022-09-18 16:24:31,258 INFO ForkProcess-4: logger start...
+2022-09-18 16:24:34,567 INFO ForkProcess-3: logger stop (3.3178)
+2022-09-18 16:24:34,567 INFO ForkProcess-2: logger stop (3.3188)
+2022-09-18 16:24:34,567 INFO ForkProcess-1: logger stop (124.6459)
+2022-09-18 16:24:34,977 INFO ForkProcess-4: logger stop (3.7182)
+2022-09-18 16:24:35,357 INFO MainProcess: Stop 
+2022-09-18 16:24:35,357 INFO Stop, всего 10000
+2022-09-18 16:51:18,996 INFO Start
+2022-09-18 16:51:18,996 INFO MainProcess: Start 
+2022-09-18 16:51:19,004 INFO ForkProcess-1: logger start...
+2022-09-18 16:51:19,004 INFO ForkProcess-3: generator start...
+2022-09-18 16:51:19,004 INFO ForkProcess-4: solving start 
+2022-09-18 16:51:19,005 INFO ForkProcess-2: solving start 
+2022-09-18 16:51:19,014 INFO ForkProcess-3: generator stop
+2022-09-18 16:51:19,014 INFO ForkProcess-3: solving start 
+2022-09-18 16:51:19,014 INFO ForkProcess-3: solving stop 
+2022-09-18 16:51:19,018 INFO ForkProcess-3: logger start...
+2022-09-18 16:51:19,128 INFO ForkProcess-4: solving stop 
+2022-09-18 16:51:19,129 INFO ForkProcess-4: logger start...
+2022-09-18 16:51:19,137 INFO ForkProcess-2: solving stop 
+2022-09-18 16:51:19,137 INFO ForkProcess-2: logger start...
+2022-09-18 16:51:19,506 INFO ForkProcess-4: logger stop (0.3762)
+2022-09-18 16:51:19,548 INFO ForkProcess-3: logger stop (0.5307)
+2022-09-18 16:51:19,549 INFO ForkProcess-1: logger stop (0.5444)
+2022-09-18 16:51:25,441 INFO ForkProcess-2: logger stop (6.304)
+2022-09-18 16:51:25,597 INFO MainProcess: Stop 
+2022-09-18 16:51:25,597 INFO Stop, всего 10
+2022-09-18 16:56:13,382 INFO Start
+2022-09-18 16:56:13,382 INFO MainProcess: Start 
+2022-09-18 16:56:13,388 INFO ForkProcess-1: logger start...
+2022-09-18 16:56:13,390 INFO ForkProcess-2: generator start...
+2022-09-18 16:56:13,391 INFO ForkProcess-3: solving start 
+2022-09-18 16:56:13,391 INFO ForkProcess-4: solving start 
+2022-09-18 16:56:13,398 INFO ForkProcess-2: generator stop
+2022-09-18 16:56:13,398 INFO ForkProcess-2: solving start 
+2022-09-18 16:56:13,399 INFO ForkProcess-2: solving stop 
+2022-09-18 16:56:13,400 INFO ForkProcess-2: logger start...
+2022-09-18 16:56:13,493 INFO ForkProcess-3: solving stop 
+2022-09-18 16:56:13,494 INFO ForkProcess-3: logger start...
+2022-09-18 16:56:13,501 INFO ForkProcess-4: solving stop 
+2022-09-18 16:56:13,501 INFO ForkProcess-4: logger start...
+2022-09-18 16:56:13,684 INFO ForkProcess-1: logger stop (0.2955)
+2022-09-18 16:56:13,725 INFO ForkProcess-2: logger stop (0.3257)
+2022-09-18 16:56:13,725 INFO ForkProcess-4: logger stop (0.224)
+2022-09-18 16:56:19,569 INFO ForkProcess-3: logger stop (6.0751)
+2022-09-18 16:56:19,693 INFO MainProcess: Stop 
+2022-09-18 16:56:19,693 INFO Stop, всего 10

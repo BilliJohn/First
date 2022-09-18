@@ -17,8 +17,8 @@ import pymysql as db
 # global flag_debug
 # gl_log_deck = mp.Queue()
 
-# global GL_CARD_DECK
-# GL_CARD_DECK = []
+# global gl_deck_new
+# gl_deck_new = []
 
 
 '''
@@ -134,11 +134,11 @@ class PrintStyle:
 
 # определяем класс колода карт, если вход пустой, то формируем раздачу 52 карты
 class DeckOfCards(object):
-    # global GL_CARD_DECK
+    # global gl_deck_new
 
     def __init__(self, _input_list=None,
                  _random=False):  # при инициации, или входной список или последовательный набор карт
-        # global GL_CARD_DECK
+        # global gl_deck_new
 
         self.list_of_cards = []
 

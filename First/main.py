@@ -3,10 +3,6 @@
 Исследование сходимости пасьянса косынка
 
 '''
-GL_CARD_DECK = []
-
-# import aiomysql
-# import asyncio
 import concurrent.futures as pool
 import json
 import logging
@@ -19,25 +15,22 @@ import platform
 import re
 import subprocess
 
-
-
-from cardclass import Card          #, GameTable
+from cardclass import Card
 from cardclass import DeckOfCards
-from cardclass import GameTable     #, log_trial
-
-# import os, platform, subprocess, re
-
+from cardclass import GameTable
 
 # КАКие-ТО ХРЕНОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ. НЕ РАБОТАЕТ МЕЖДУ МОДУЛЯМИ
-GL_CARD_DECK.extend(Card(_I) for _I in range(0, 52))
+gl_deck_new = []
+gl_deck_new.extend(Card(_I) for _I in range(0, 52))
 
 # счетчик итераций изврат конечно
-gl_total_step = mp.Queue()
-gl_total_step.put(0)
+gl_step_count = mp.Queue()
+gl_step_count.put(0)
 
-gl_log_deck = mp.Queue(maxsize=5000)
-card_deck_list = mp.Queue()
-card_deck_list = mp.Queue(maxsize=5000)
+# card_deck_list = mp.Queue()
+card_deck_list = mp.Queue(maxsize=1000)
+gl_log_deck = mp.Queue()
+# gl_log_deck = mp.Queue(maxsize=1000)
 
 flag_will_be_new = mp.Event()
 flag_will_be_new.set()
@@ -52,7 +45,6 @@ def realtime_log_in(table_for_log):
     global gl_log_deck
     gl_log_deck.put(table_for_log)
     flag_log_ready.set()
-    # print('регистрируем')
     return
 
 
@@ -111,17 +103,12 @@ def realtime_log_out():
     global gl_log_deck
     tfl: GameTable
     time_start = time.time()
-    bufer_size = 1
+    bufer_size = 10
     logging.info('{}: logger start...'.format(mp.current_process().name))
     _log_connection = open_db()
     flag_log_ready.wait(1)
-    # print('пошел сброс...', )
 
     while not gl_log_deck.empty() or flag_log_ready.is_set() or flag_will_be_new.is_set():
-        # logging.info('{}: logger work... empt {} logready {} willnew {}'.format(
-        #     mp.current_process().name, gl_log_deck.empty(), flag_log_ready.is_set(), flag_will_be_new.is_set()))
-        # print('взлет')
-        # print('{} летим {}'.format(mp.current_process().name, gl_log_deck.qsize()))
         if gl_log_deck.qsize() > bufer_size or not flag_will_be_new.is_set():
 
             tfl = gl_log_deck.get(timeout=0.1)
@@ -132,7 +119,6 @@ def realtime_log_out():
             cur = _log_connection.cursor()
             query = "SELECT ID_HASH FROM gametables WHERE ID_HASH = {}".format(tfl.start_hash)
             cur.execute(query)
-            # print(query)
             if cur.fetchone():
                 query = "UPDATE ALLCARD.gametables SET DECISION={}, DECK_JSON='{}', DECISION_TIME={}, MOVE_COUNT={} WHERE  ID_HASH={}".format(
                     tfl.win, _json, tfl.solve_time, tfl.count_moves, tfl.start_hash)
@@ -140,12 +126,8 @@ def realtime_log_out():
                 query = "INSERT INTO ALLCARD.gametables(ID_HASH, DECISION, DECK_JSON, DECISION_TIME, MOVE_COUNT) VALUES ({}, {}, '{}', {}, {})".format(
                     tfl.start_hash, tfl.win, _json, tfl.solve_time, tfl.count_moves)
             cur.execute(query)
-            # print(query)
-            # print('завершение ID: ', tfl.start_hash)
-            # print('переход: ')
         else:
             time.sleep(0.1)
-            # print('{} не летим {}'.format(mp.current_process().name, gl_log_deck.qsize()))
 
         if not flag_will_be_new.is_set() and gl_log_deck.empty() and card_deck_list.empty():
             flag_log_ready.clear()
@@ -154,7 +136,6 @@ def realtime_log_out():
 
     close_db(_log_connection)
 
-    # print('время сброса: ', round(time.time() - time_start, 5))
     logging.info('{}: logger stop ({})'.format(mp.current_process().name, round(time.time() - time_start, 4)))
     return
 
@@ -180,15 +161,14 @@ def create_decks(total_steps=0):
 
 #  решение одной раздачи, данные берем из очереди card_deck_list
 def solve_tables():
-    global card_deck_list, flag_will_be_new, gl_total_step, gl_log_deck
+    global card_deck_list, flag_will_be_new, gl_step_count, gl_log_deck
     logging.info('{}: solving start '.format(mp.current_process().name))
-    # print('{}: еще нет {}{}.'.format(mp.current_process().name, card_deck_list.empty(), flag_will_be_new.is_set()))
 
     while not card_deck_list.empty() or flag_will_be_new.is_set():
         table_for_solve: GameTable
         table_for_solve = GameTable(card_deck_list.get(timeout=0.01))
         table_for_solve.solve_table()
-        gl_total_step.put(gl_total_step.get() + 1)
+        gl_step_count.put(gl_step_count.get() + 1)
 
         realtime_log_in(table_for_solve)
 
@@ -198,7 +178,7 @@ def solve_tables():
 
 #  проведение эксперимента с указанием количества попыток
 def start_solving(total_steps=0):
-    global card_deck_list, flag_will_be_new, gl_total_step
+    global card_deck_list, flag_will_be_new, gl_step_count
     if total_steps:
         _wins = 0
         all_proc = mp.cpu_count()
@@ -208,19 +188,18 @@ def start_solving(total_steps=0):
 
         logging.info('{}: Start '.format(mp.current_process().name))
 
-        tasks = [(create_decks, total_steps)]
-        tasks.extend([(realtime_log_out,)])
-        tasks.extend([(solve_tables,)] * (all_proc - 1))
+        # сначала запускаем лог, он самый медленный
+        tasks = [(realtime_log_out,)]
+        tasks.extend([(create_decks, total_steps)])
+        tasks.extend([(solve_tables,)] * (all_proc-1))
         tasks.extend([(realtime_log_out,)] * (all_proc - 1))
 
         with pool.ProcessPoolExecutor(max_workers=all_proc) as ex:
             futures = [ex.submit(*task) for task in tasks]
 
         _j = round(time.time() - step_start, 4)
-        total_steps = gl_total_step.get()
-        gl_total_step.put(total_steps)
-        # realtime_log()
-        # log_trial(_j, total_steps, _wins, round(_wins / total_steps * 100, 2))
+        total_steps = gl_step_count.get()
+        gl_step_count.put(total_steps)
         log_trial(_j, total_steps, _wins, 0)
         logging.info('{}: Stop '.format(mp.current_process().name))
 
@@ -233,7 +212,7 @@ if __name__ == '__main__':
     _param = sys.argv
     print("СТАРТ.")
 
-    round_amount = 10000           # <----- тут
+    round_amount = 10           # <----- тут
     round_amount = round_amount if len(_param) == 1 else 10 ** (len(_param[1]) - 1)
     start_time = time.time()
 
@@ -244,7 +223,7 @@ if __name__ == '__main__':
 
     start_solving(round_amount)
 
-    logging.info("Stop, всего {}".format(gl_total_step.get()))
+    logging.info("Stop, всего {}".format(gl_step_count.get()))
     print("ВСЕ.")
 
 # #  всякое
